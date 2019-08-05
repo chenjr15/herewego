@@ -1,0 +1,15 @@
+default_welcome_msg = "Simple Go server!"
+echo_buf_size = 8192
+
+[HTTPConfig]
+  host = "0.0.0.0:60066"
+
+[RouteConfig]
+  echo = "/echo"
+  # 默认的index文件， 如果访问的目录下有该文件， 则直接重定向至该文件
+  index = "index.html"
+  time = "/time"
+
+[TemplateConfig]
+  ListDirTemplate = "<html>\n\t\t\t\t<head><title>{{.Welcome}}</title></head>\n\t\t\t\t<body>\n\t\t\t\t<h1>{{.Welcome}}</h1>\n\t\t\t\t<p>Path: {{.Path}}</p>\n\t\t\t\t<table>\n\t\t\t\t<tr>\n\t\t\t\t\t\t<th>Name</th>\n\t\t\t\t\t\t<th>Size</th>\n\t\t\t\t</tr>\n\t\t\t\t{{range .Files}}\n\t\t\t\t<tr>\n\t\t\t\t\t\t<td><a href=\"{{.LinkName}}\" >{{.Name}}</a></td>\n\t\t\t\t\t\t<td>{{.Size}} bytes</td>\n\t\t\t\t</tr>\n\t\t\t\t{{end}}\n\t\t\t\t</table>\n\t\t\t\t</body>\n\t\t\t\t<html>\n\t\t\t\t"
+  ListDirTemplateFile = "dir.template.html"

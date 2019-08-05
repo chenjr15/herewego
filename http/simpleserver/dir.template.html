@@ -1,0 +1,23 @@
+<html>
+
+<head>
+    <title>{{.Welcome}}</title>
+</head>
+
+<body>
+    <h1>{{.Welcome}} From Template File </h1>
+    <p>Path: {{.Path}}</p>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Size</th>
+        </tr>
+        {{range .Files}}
+        <tr>
+            <td><a href="{{.LinkName}}">{{.Name}}</a></td>
+            <td>{{.Size}} bytes</td>
+        </tr>
+        {{end}}
+    </table>
+</body>
+<html>
