@@ -2,19 +2,19 @@ package main
 
 // HTTPConfig like listent host and port
 type HTTPConfig struct {
-	Host string `toml:"host"`
+	Host string `toml:"host" comment:"监听的IP和端口，格式host:port, 如0.0.0.0:60066"`
 }
 
 // RouteConfig shows the route for specify function
 type RouteConfig struct {
-	Index string `toml:"index"`
+	Index string `toml:"index" comment:"默认的index文件， 如果访问的目录下有该文件， 则直接重定向至该文件"`
 	Echo  string `toml:"echo"`
 	Time  string `toml:"time"`
 }
 // TemplateConfig if ListDirTemplateFile was set , ListDirTemplate will be ignore
 type TemplateConfig struct {
-	ListDirTemplate     string
-	ListDirTemplateFile string
+	ListDirTemplate     string `comment:"直接指定模板内容， 仅在ListDirTemplateFile为空时有效"`
+	ListDirTemplateFile string `comment:"指定模板文件"`
 }
 
 // Config Struct for configuration
