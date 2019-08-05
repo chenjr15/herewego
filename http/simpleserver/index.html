@@ -1,0 +1,34 @@
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <title>
+        Simple Go server!
+    </title>
+</head>
+
+<body>
+    <div id="content">
+
+    </div>
+
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/9.0.1/markdown-it.js"></script>
+<script>
+    xhr = new XMLHttpRequest();
+    xhr.open("GET", "README.md")
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+
+            var md = window.markdownit();
+            var result = md.render(xhr.responseText);
+            var content = document.getElementById("content")
+            content.innerHTML = result
+        }
+    }
+    xhr.send()
+
+
+</script>
+
+</html>
