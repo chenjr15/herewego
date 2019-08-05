@@ -7,7 +7,7 @@
 - [作为文件服务器](doc/)
 - [显示时间](time)    
 - [显示用户UA](echo)
-- TOML 格式的配置文件 [examplate](config.toml)
+- TOML 格式的配置文件 [example](config.toml)
 
 ## 作为文件服务器
 
