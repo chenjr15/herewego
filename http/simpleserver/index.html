@@ -13,20 +13,38 @@
     </div>
 
 </body>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/default.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/9.0.1/markdown-it.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js" integrity="sha256-AIeoCoYob+LP5IKqSqhSgagg7jY5XcJ3n/XEO7b/OX8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/languages/ini.min.js" integrity="sha256-iXzs0ydAGNDDX9QBax4ByJ69fFQXZrT9WgAFXT4NQ6o=" crossorigin="anonymous"></script>
 <script>
+    hljs.initHighlightingOnLoad();
+    var md = window.markdownit({
+        highlight: function (str, lang) {
+            if (lang && hljs.getLanguage(lang)) {
+                try {
+                    return hljs.highlight(lang, str).value;
+                } catch (__) { }
+            }
+
+            return ''; // use external default escaping
+        }
+    });
+
     xhr = new XMLHttpRequest();
     xhr.open("GET", "README.md")
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
 
-            var md = window.markdownit();
+
             var result = md.render(xhr.responseText);
             var content = document.getElementById("content")
             content.innerHTML = result
         }
     }
     xhr.send()
+
 
 
 </script>
