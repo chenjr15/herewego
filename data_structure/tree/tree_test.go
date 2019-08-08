@@ -32,6 +32,7 @@ func TestLevelOrder(t *testing.T) {
 
 }
 func TestTreePrint(t *testing.T) {
+	tree.AttachLeft(New(9))
 	s := tree.TreeString()
 	fmt.Print(s)
 

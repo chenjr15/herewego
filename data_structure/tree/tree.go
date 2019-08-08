@@ -141,6 +141,20 @@ func (t *Node) InOrderTraversal(visit func(*Node)) {
 
 }
 
+// AttachLeft go to the end of left and attach a new node, then return the father of new node
+func (t *Node) AttachLeft(node *Node) *Node {
+	if t == nil {
+		return nil
+	}
+	for t.Left != nil {
+		t = t.Left
+	}
+	t.Left = node
+
+	return t
+
+}
+
 // AddLeft go to the end of left and add a new node, then return new node
 func (t *Node) AddLeft(val int) *Node {
 	if t == nil {
@@ -155,6 +169,20 @@ func (t *Node) AddLeft(val int) *Node {
 		nil,
 	}
 	return t.Left
+
+}
+
+// AttachRight go to the end of left and attach a new node, then return the father of new node
+func (t *Node) AttachRight(node *Node) *Node {
+	if t == nil {
+		return nil
+	}
+	for t.Right != nil {
+		t = t.Right
+	}
+	t.Right = node
+
+	return t
 
 }
 
