@@ -58,6 +58,65 @@ func (t *Node) LevelOrderTraversal(visit func(*Node, int)) {
 
 }
 
+// PreOrderTraversal 先序遍历
+func (t *Node) PreOrderTraversal(visit func(*Node)) {
+	if t == nil {
+		return
+	}
+	stack := make([]*Node, 0)
+	p := t
+	for p != nil || len(stack) != 0 {
+		if p != nil {
+			visit(p)
+			if p.Right != nil {
+				stack = append(stack, p.Right)
+			}
+			if p.Left != nil {
+				stack = append(stack, p.Left)
+			}
+			p = nil
+
+		} else {
+			p = stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+		}
+
+	}
+}
+
+// PostOrderTraversal 后序遍历
+// 双栈法， 稍微修改先序遍历，按照 根右左 的顺序将元素如打印栈，再不断弹出打印栈中的元素访问即可
+func (t *Node) PostOrderTraversal(visit func(*Node)) {
+	if t == nil {
+		return
+	}
+	stack := make([]*Node, 0)
+	result := make([]*Node, 0)
+	p := t
+	for p != nil || len(stack) != 0 {
+		if p != nil {
+			result = append(result, p)
+			if p.Left != nil {
+				stack = append(stack, p.Left)
+			}
+			if p.Right != nil {
+				stack = append(stack, p.Right)
+			}
+
+			p = nil
+
+		} else {
+			p = stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+		}
+
+	}
+	for i := len(result) - 1; i > -1; i-- {
+		visit(result[i])
+
+	}
+}
+
 // InOrderTraversal 中序遍历
 // 用栈实现，先碰到元素先入栈，然后往左边走，重复直到左边为空，然后出栈并访问，然后往右边走，重复前面的入栈往左边走
 func (t *Node) InOrderTraversal(visit func(*Node)) {
