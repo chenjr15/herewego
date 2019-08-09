@@ -2,7 +2,7 @@ package rbtree
 
 import "testing"
 
-func TestAAAA(t *testing.T) {
+func TestRotate(t *testing.T) {
 	tree := New(6)
 	tree.Color = BLACK
 	node := tree.AddLeft(1)
@@ -46,4 +46,7 @@ func TestAAAA(t *testing.T) {
 	tree.LeftRotate(node)
 	print()
 
+	node = tree.Search(10)
+	tree.RightRotate(node)
+	print()
 }
