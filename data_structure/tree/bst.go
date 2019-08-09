@@ -10,7 +10,7 @@ func MakeBST(vals []int) *Node {
 
 	bst := New(vals[0])
 	for i := 1; i < len(vals); i++ {
-		bst.InsertBST(vals[i])
+		bst.AddBST(vals[i])
 	}
 
 	return bst
