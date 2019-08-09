@@ -16,8 +16,8 @@ func MakeBST(vals []int) *Node {
 	return bst
 }
 
-// 将一棵树合并入另一颗二叉树，不改变其性质
-func (bt *BST) MergeBST(anotherBT *BST) (father *Node) {
+// MergeBST 将一棵树合并入另一颗二叉树，不改变其性质
+func (bt *BST) MergeBST(anotherBT *BST) (parent *Node) {
 	if bt == nil {
 		return anotherBT
 	}
@@ -33,7 +33,7 @@ func (bt *BST) MergeBST(anotherBT *BST) (father *Node) {
 
 }
 
-// InsertBST 将数据插入二叉排序树，不改变其性质
+// InsertBST 将结点插入二叉排序树，不改变其性质
 func (bt *BST) InsertBST(node *Node) *Node {
 	if bt == nil {
 		return nil
@@ -47,6 +47,7 @@ func (bt *BST) InsertBST(node *Node) *Node {
 				bt = bt.Right
 			} else {
 				bt.Right = node
+				node.Parent = bt
 				bt = nil
 			}
 
@@ -56,6 +57,7 @@ func (bt *BST) InsertBST(node *Node) *Node {
 
 			} else {
 				bt.Left = node
+				node.Parent = bt
 				bt = nil
 			}
 		}
@@ -65,7 +67,7 @@ func (bt *BST) InsertBST(node *Node) *Node {
 
 }
 
-// InsertBST 将数据插入二叉排序树，不改变其性质
+// AddBST 将数据插入二叉排序树，不改变其性质
 func (bt *BST) AddBST(val int) *Node {
 	if bt == nil {
 		return nil
@@ -77,6 +79,7 @@ func (bt *BST) AddBST(val int) *Node {
 				bt = bt.Right
 			} else {
 				bt.Right = node
+				node.Parent = bt
 				bt = nil
 			}
 
@@ -86,6 +89,7 @@ func (bt *BST) AddBST(val int) *Node {
 
 			} else {
 				bt.Left = node
+				node.Parent = bt
 				bt = nil
 			}
 		}
@@ -113,54 +117,43 @@ func (bt *BST) Search(val int) (node *BST) {
 
 }
 
-// SearchFather 根据指返回对应结点的父节点，查找失败返回nil
-func (bt *BST) SearchFather(val int) (father *BST) {
-	for bt != nil {
-		if val == bt.Val {
-			return father
-
-		} else if val > bt.Val {
-			father = bt
-			bt = bt.Right
-
-		} else if val < bt.Val {
-			father = bt
-			bt = bt.Left
-		}
-	}
-
-	return nil
-
-}
-
+// RemoveBST 删除结点. 无法删除根节点
 func (bt *BST) RemoveBST(val int) (toRemove *BST) {
 
-	fmt.Printf("Remove %v\n", val)
-	father := bt.SearchFather(val)
-	if father == nil {
+	toRemove = bt.Search(val)
+	if toRemove == nil {
 		return nil
 	}
-	fmt.Printf("father : %v, l: %v, r: %v \n", father, father.Left, father.Right)
-	if father.Left != nil && father.Left.Val == val {
-		toRemove = father.Left
+	parent := toRemove.Parent
+
+	if parent == nil {
+		return toRemove
+	}
+	if parent.Left != nil && parent.Left == toRemove {
 		if toRemove.Left != nil {
-			father.Left = toRemove.Left
+			parent.Left = toRemove.Left
+			toRemove.Left.Parent = parent
+		} else {
+			parent.Left = nil
 		}
 
 	} else {
 
-		toRemove = father.Right
-		fmt.Printf("ToRemove :%v ", toRemove)
 		if toRemove.Left != nil {
-			father.Right = toRemove.Left
+			parent.Right = toRemove.Left
+			toRemove.Left.Parent = parent
+		} else {
+			parent.Right = nil
 		}
 	}
 
-	father.MergeBST(toRemove.Right)
+	parent.MergeBST(toRemove.Right)
 
 	return toRemove
 
 }
+
+// BSTString 按层输出
 func (bt *BST) BSTString() string {
 	result := ""
 	appendStr := func(node *Node) {

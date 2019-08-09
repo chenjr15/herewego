@@ -7,18 +7,20 @@ import (
 
 // Node struct of tree
 type Node struct {
-	Val   int
-	Left  *Node
-	Right *Node
+	Val    int
+	Left   *Node
+	Right  *Node
+	Parent *Node
 }
 
 // New Return a new Node with val
 func New(val int) *Node {
 
 	return &Node{
-		Val:   val,
-		Left:  nil,
-		Right: nil,
+		Val:    val,
+		Left:   nil,
+		Right:  nil,
+		Parent: nil,
 	}
 }
 
@@ -42,7 +44,6 @@ func (t *Node) LevelOrderTraversal(visit func(*Node, int)) {
 		for thisLevel != 0 {
 			t = (queue.Remove(queue.Front())).(*Node)
 			thisLevel--
-			visit(t, level)
 			if t.Left != nil {
 				queue.PushBack(t.Left)
 				lastLevel++
@@ -51,6 +52,7 @@ func (t *Node) LevelOrderTraversal(visit func(*Node, int)) {
 				queue.PushBack(t.Right)
 				lastLevel++
 			}
+			visit(t, level)
 		}
 		level++
 
@@ -150,6 +152,7 @@ func (t *Node) AttachLeft(node *Node) *Node {
 		t = t.Left
 	}
 	t.Left = node
+	node.Parent = t
 
 	return t
 
@@ -164,9 +167,10 @@ func (t *Node) AddLeft(val int) *Node {
 		t = t.Left
 	}
 	t.Left = &Node{
-		val,
-		nil,
-		nil,
+		Val:    val,
+		Left:   nil,
+		Right:  nil,
+		Parent: t,
 	}
 	return t.Left
 
@@ -181,6 +185,7 @@ func (t *Node) AttachRight(node *Node) *Node {
 		t = t.Right
 	}
 	t.Right = node
+	node.Parent = t
 
 	return t
 
@@ -195,9 +200,10 @@ func (t *Node) AddRight(val int) *Node {
 		t = t.Right
 	}
 	t.Right = &Node{
-		val,
-		nil,
-		nil,
+		Val:    val,
+		Left:   nil,
+		Right:  nil,
+		Parent: t,
 	}
 	return t.Right
 

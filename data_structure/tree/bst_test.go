@@ -25,11 +25,17 @@ func TestRemove(t *testing.T) {
 	t.Log("\n", t1.BSTString())
 	remove := []int{1, 4, 5, 10}
 	for _, k := range remove {
+		t.Log("Removing ", k)
 
-		v := t1.RemoveBST(k)
-
-		t.Log(v)
+		t1.RemoveBST(k)
 		t.Log("\n", t1.BSTString())
+
+		result := ""
+		visit := func(node *Node) {
+			result += fmt.Sprintf("%v^%v ", node, node.Parent)
+		}
+		t1.InOrderTraversal(visit)
+		t.Log(result)
 	}
 
 }
@@ -38,8 +44,7 @@ func TestBST(t *testing.T) {
 	t.Log(vals)
 	result := ""
 	visit := func(node *Node) {
-
-		result += fmt.Sprintf("%v", node)
+		result += fmt.Sprintf("%v^%v ", node, node.Parent)
 	}
 	bst.InOrderTraversal(visit)
 	t.Log(result)
@@ -57,18 +62,6 @@ func TestSearch(t *testing.T) {
 	for _, val := range notExists {
 		node := bst.Search(val)
 		if node != nil {
-			t.Errorf("%v misatch got :%v", val, node)
-		}
-	}
-
-	for i, val := range vals {
-		node := bst.SearchFather(val)
-		if node == nil || node.Val != fathers[i] {
-
-			if node == nil && fathers[i] == -1 {
-				break
-
-			}
 			t.Errorf("%v misatch got :%v", val, node)
 		}
 	}
