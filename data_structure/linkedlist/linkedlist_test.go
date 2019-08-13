@@ -1,147 +1,126 @@
 package linkedlist
 
-import (
-	"testing"
-)
+import "fmt"
 
-func TestHasCycle(t *testing.T) {
-	listOfNode := [9]*ListNode{}
-	head := &ListNode{0, nil}
-	listOfNode[0] = head
+// ListNode linked list
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+// Add Generate a new element then attach to the tail of list, list may not be nil
+func (l *ListNode) Add(x int) *ListNode {
+	if l == nil {
+		return nil
+	}
+	for ; l.Next != nil; l = l.Next {
+	}
+	l.Next = &ListNode{x, nil}
+	return l
+
+}
+
+// CyclePos return the cross position of cycle
+func (l *ListNode) CyclePos() (crossAt *ListNode) {
+	if l == nil || l.Next == nil {
+		return nil
+	}
+	forward := true
+	slow := l
+	var p *ListNode
+	for fast := l.Next; fast != nil; fast = fast.Next {
+		if fast.Next == slow.Next {
+			p = slow.Next
+			break
+		}
+		if forward {
+			slow = slow.Next
+		}
+		forward = !forward
+
+	}
+	for slow = l; p != nil; {
+		if slow == p {
+			return slow
+		}
+		p = p.Next
+		slow = slow.Next
+
+	}
+	return nil
+}
+
+// HasCycle Determine if it has a cycle in it
+func (l *ListNode) HasCycle() bool {
+
+	return l.CyclePos() != nil
+}
+
+// MakeLinkedList make a linked list form int slice
+func MakeLinkedList(data []int) (head *ListNode) {
+	head = new(ListNode)
 	p := head
-	for i := 1; i < 9; i++ {
-		p = head.Add(i)
-		listOfNode[i] = p
+	for _, item := range data {
+		p.Next = new(ListNode)
+		p = p.Next
+		p.Val = item
 	}
-	t.Log(head)
-	if head.HasCycle() {
-		t.Log("Error it should have cycle .")
-	}
-	p.Next.Next = listOfNode[3]
-
-	if head.HasCycle() {
-		t.Log("cycle here", head.CyclePos().Val)
-		t.Log(head)
-	} else {
-
-		t.Log("Error it should have cycle .")
-	}
-
+	p.Next = nil
+	head = head.Next
+	return
 }
 
-func TestAddNew(t *testing.T) {
-
-	testcases := []struct {
-		l1     []int
-		l2     []int
-		equals bool
-	}{
-		{
-			l1:     []int{},
-			l2:     []int{1},
-			equals: false,
-		},
-		{
-			l1:     []int{},
-			l2:     []int{},
-			equals: true,
-		},
-		{
-			l1:     []int{1},
-			l2:     []int{1, 1},
-			equals: true,
-		},
-		{
-			l1:     []int{1, 2, 3},
-			l2:     []int{1, 2, 3, 1},
-			equals: true,
-		},
-		{
-			l1:     []int{1, 2},
-			l2:     []int{},
-			equals: false,
-		},
+// ListNodeEquals judge whether two linked list equals
+func ListNodeEquals(l1, l2 *ListNode) bool {
+	if l1 == nil || l2 == nil {
+		return l1 == l2
 	}
-	for i, tcase := range testcases {
-		l1 := MakeLinkedList(tcase.l1)
-		l2 := MakeLinkedList(tcase.l2)
-		l1.Add(1)
-		equals := ListNodeEquals(l1, l2)
-		if equals == tcase.equals {
-			t.Logf("%d/%d PASSED %v ", i+1, len(testcases), l1)
-		} else {
-			t.Errorf("%d/%d FAILED %v,%v ", i+1, len(testcases), l1, l2)
+	for l1 != nil && l2 != nil {
+		if l1.Val != l2.Val {
+			break
 		}
-
+		l1 = l1.Next
+		l2 = l2.Next
 	}
-
+	return l1 == l2
 }
 
-func TestMakeLinkList(t *testing.T) {
-	testcases := [][]int{
-		{},
-		{1},
-		{1, 2, 3},
+// Reverse a LinkList, and return reversed list
+func Reverse(list *ListNode) (reversed *ListNode) {
+	if list == nil {
+		return nil
 	}
-	for _, sl := range testcases {
-		l := MakeLinkedList(sl)
-		t.Logf("l = [%v]", l)
+	var next *ListNode
+	var last *ListNode
+	p := list
+	for p.Next != nil {
+		next = p.Next
+		p.Next = last
+		last = p
+		p = next
 	}
+	p.Next = last
 
+	return p
 }
-func TestListNodeEquals(t *testing.T) {
-	testcases := []struct {
-		l1     []int
-		l2     []int
-		equals bool
-	}{
-		{
-			// 1
-			l1:     []int{},
-			l2:     []int{},
-			equals: true,
-		},
-		{
-			// 2
-			l1:     []int{},
-			l2:     []int{1},
-			equals: false,
-		},
-		{
-			// 3
-			l1:     []int{1},
-			l2:     []int{1},
-			equals: true,
-		},
-		{
-			// 4
-			l1:     []int{1},
-			l2:     []int{1, 2, 3},
-			equals: false,
-		},
-		{
-			// 5
-			l1:     []int{1, 2, 3},
-			l2:     []int{1, 2, 3},
-			equals: true,
-		},
-		{
-			// 6
-			l1:     []int{1, 2},
-			l2:     []int{},
-			equals: false,
-		},
-	}
-	for i, tcase := range testcases {
-		l1 := MakeLinkedList(tcase.l1)
-		l2 := MakeLinkedList(tcase.l2)
-		equals := ListNodeEquals(l1, l2)
-		if equals == tcase.equals {
-			t.Logf("%d/%d PASSED ", i+1, len(testcases))
-		} else {
-			t.Errorf("%d/%d FAILED %v,%v ", i+1, len(testcases), l1, l2)
+
+func (l *ListNode) String() (result string) {
+	cycle := l.CyclePos()
+
+	met := false
+	for l != nil {
+		if l == cycle {
+			if met {
+				result += "<"
+				return
+			}
+			result += "^"
+			met = true
+
 		}
-
+		result += fmt.Sprintf("%v-> ", l.Val)
+		l = l.Next
 	}
-
+	result += "&"
+	return
 }

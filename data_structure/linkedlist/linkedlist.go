@@ -8,7 +8,7 @@ type ListNode struct {
 	Next *ListNode
 }
 
-// Add(int) Generate a new element then attach to the tail of list, list may not be nil
+// Add Generate a new element then attach to the tail of list, list may not be nil
 func (l *ListNode) Add(x int) *ListNode {
 	if l == nil {
 		return nil
@@ -20,7 +20,7 @@ func (l *ListNode) Add(x int) *ListNode {
 
 }
 
-// CyclePos() return the cross position of cycle
+// CyclePos return the cross position of cycle
 func (l *ListNode) CyclePos() (crossAt *ListNode) {
 	if l == nil || l.Next == nil {
 		return nil
@@ -50,13 +50,13 @@ func (l *ListNode) CyclePos() (crossAt *ListNode) {
 	return nil
 }
 
-// HasCycle()  Determine if it has a cycle in it
+// HasCycle Determine if it has a cycle in it
 func (l *ListNode) HasCycle() bool {
 
 	return l.CyclePos() != nil
 }
 
-// MakeLinkList make a linked list form int slice
+// MakeLinkedList make a linked list form int slice
 func MakeLinkedList(data []int) (head *ListNode) {
 	head = new(ListNode)
 	p := head
@@ -83,6 +83,25 @@ func ListNodeEquals(l1, l2 *ListNode) bool {
 		l2 = l2.Next
 	}
 	return l1 == l2
+}
+
+// Reverse a LinkList, and return reversed list
+func Reverse(list *ListNode) (reversed *ListNode) {
+	if list == nil {
+		return nil
+	}
+	var next *ListNode
+	var last *ListNode
+	p := list
+	for p.Next != nil {
+		next = p.Next
+		p.Next = last
+		last = p
+		p = next
+	}
+	p.Next = last
+
+	return p
 }
 
 func (l *ListNode) String() (result string) {
