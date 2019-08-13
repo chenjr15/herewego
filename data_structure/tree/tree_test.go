@@ -8,7 +8,7 @@ import (
 var tree *Node
 
 func Print(node *Node) {
-	fmt.Println(node.Val)
+	fmt.Printf("%v ", node.Val)
 }
 func init() {
 	tree = New(0)
@@ -23,6 +23,7 @@ func TestInOrder(t *testing.T) {
 	tree := New(0)
 	tree.AddLeft(1).AddRight(2)
 	tree.InOrderTraversal(Print)
+	fmt.Println("")
 
 }
 func TestLevelOrder(t *testing.T) {
@@ -35,15 +36,18 @@ func TestTreePrint(t *testing.T) {
 	tree.AttachLeft(New(9))
 	s := tree.TreeString()
 	fmt.Print(s)
+	fmt.Println("")
 
 }
 func TestPreOrder(t *testing.T) {
 
 	tree.PreOrderTraversal(Print)
 
+	fmt.Println("")
 }
 func TestPostOrder(t *testing.T) {
 
 	tree.PostOrderTraversal(Print)
+	fmt.Println("")
 
 }
