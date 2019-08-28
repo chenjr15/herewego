@@ -18,6 +18,23 @@
 <script type="text/javascript">
     var sock = null;
     var wsuri = "ws://localhost:60012";
+    var myid = null;
+    var lastmsg = null;
+    const TYPE_MSG = 0;
+    const TYPE_GETID = 1;
+    const TYPE_SETID = 2;
+    const TYPE_NEWUSER = 3;
+    const MSGTMPL = {
+        "type": 0,
+        "version": 0,
+        "data": {
+            "sender_id": "system",
+            "receiver_id": "222.76.251.164:54386",
+            "content": "Welcome",
+            "time_stamp": "2019-08-28T17:00:42.128094409+08:00",
+            "msg_version": 0
+        }
+    }
     console.log("onload");
 
     sock = new WebSocket(wsuri);
@@ -31,13 +48,48 @@
     }
 
     sock.onmessage = function(e) {
-        console.log("message received: " + e.data);
+
+        d = JSON.parse(e.data)
+        lastmsg = e.data
+            // console.log("message received: " + e.data);
+        switch (d.type) {
+            case TYPE_SETID:
+                myid = d.message.receiver_id
+                console.log("Set id " + myid);
+                break;
+
+            case TYPE_MSG:
+                console.log(`[${d.message.sender_id}]->[${d.message.receiver_id}] : ${d.message.content}`);
+            default:
+                break;
+        }
+
     }
 
+    function NewMessage(content, to) {
+        var d = new Date();
+
+        var msg = {
+            "type": 0,
+            "version": 0,
+            "message": {
+                "sender_id": myid,
+                "receiver_id": to,
+                "content": content,
+                "time_stamp": d.toISOString(),
+                "msg_version": 0
+            }
+        }
+        msg.message.sender_id = myid;
+        msg.message.content = content
+        msg.message.receiver_id = to
+        return msg;
+    }
 
     function send() {
-        var msg = document.getElementById('message').value;
-        sock.send(msg);
+        var content = document.getElementById('message').value;
+        var msg = NewMessage(content, myid)
+        sock.send(JSON.stringify(msg));
     };
 </script>
 

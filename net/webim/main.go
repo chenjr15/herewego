@@ -11,16 +11,17 @@ import (
 )
 
 const (
-	TYPE_MSG int = iota
-	TYPE_GETID
-	TYPE_SETID
-	TYPE_NEWUSER
+	TYPE_MSG     = 0
+	TYPE_GETID   = 1
+	TYPE_SETID   = 2
+	TYPE_NEWUSER = 3
 )
 
 type DataGram struct {
 	Type    int         `json:"type"`
 	Version int         `json:"version"`
 	Data    interface{} `json:"data"`
+	Message *Message    `json:"message"`
 }
 type Message struct {
 	SenderID   string    `json:"sender_id"`
@@ -35,14 +36,14 @@ type Client struct {
 	ch chan *DataGram
 }
 
-var msgToMux chan *DataGram
+var dgToMux chan *DataGram
 
 var clientChan chan *Client
 var clients map[string]*Client
 
 func main() {
 	clientChan = make(chan *Client)
-	msgToMux = make(chan *DataGram)
+	dgToMux = make(chan *DataGram)
 	clients = make(map[string]*Client)
 	go mux()
 	http.Handle("/", websocket.Handler(HandleMessage))
@@ -51,20 +52,48 @@ func main() {
 		log.Fatal("ListenAndServe:", err)
 	}
 }
+func dealWithNewDatagram(datagram *DataGram) {
+
+	log.Printf("muxing %v", datagram)
+	switch datagram.Type {
+
+	case TYPE_SETID:
+		// 新用户加入消息,
+		if datagram.Message != nil {
+			m := datagram.Message
+			c := clients[m.ReceiverID]
+			c.ch <- datagram
+			newMsg := m.Copy()
+			newMsg.ReceiverID = "all"
+			datagramNew := NewDataGram(TYPE_NEWUSER, newMsg, nil)
+			datagram = datagramNew
+
+			// 发送一个全体消息通知新人到来
+			dgToMux <- datagramNew
+		}
+
+	case TYPE_NEWUSER:
+		log.Printf("sending to all %v", datagram)
+		for _, c := range clients {
+			c.ch <- datagram
+		}
+		return
+
+	case TYPE_MSG:
+		c := clients[datagram.Message.ReceiverID]
+		c.ch <- datagram
+
+	}
+}
 func mux() {
 	var newClient *Client
-	var msg *DataGram
+	var datagram *DataGram
 	for {
 		select {
 		case newClient = <-clientChan:
 			clients[newClient.id] = newClient
-		case msg = <-msgToMux:
-			log.Printf("muxing %v", msg)
-
-			for _, c := range clients {
-				log.Printf("copying %v", msg)
-				c.ch <- msg
-			}
+		case datagram = <-dgToMux:
+			dealWithNewDatagram(datagram)
 
 		}
 
@@ -84,10 +113,10 @@ func HandleMessage(ws *websocket.Conn) {
 	dg := &DataGram{
 		Type:    TYPE_SETID,
 		Version: 0,
-		Data:    client.id,
+		Message: NewMessage("system", client.id, "Welcome", time.Now()),
 	}
-	msg := dg.Marshal()
-	if err = websocket.Message.Send(ws, msg); err != nil {
+	datagram := dg.Marshal()
+	if err = websocket.Message.Send(ws, datagram); err != nil {
 		fmt.Println("Can't send")
 		return
 	}
@@ -111,16 +140,16 @@ func HandleMessage(ws *websocket.Conn) {
 
 			}
 			log.Printf("Received : %v", dg)
-			msgToMux <- dg
+			dgToMux <- dg
 
 		}
 	}()
 
 	for {
 		dataGram := <-client.ch
-		msg := dataGram.Marshal()
-		log.Printf("Sending : %s", msg)
-		if err = websocket.Message.Send(ws, msg); err != nil {
+		datagram := dataGram.Marshal()
+		log.Printf("Sending : %s", datagram)
+		if err = websocket.Message.Send(ws, datagram); err != nil {
 			fmt.Println("Can't send")
 			break
 		}
@@ -137,13 +166,13 @@ func (m *DataGram) Unmarshal(s string) error {
 	return err
 }
 func (m *DataGram) Marshal() string {
-	msg, e := json.Marshal(m)
+	datagram, e := json.Marshal(m)
 	if e != nil {
 		log.Printf("Fail to marshal %v ,%v", m, e)
 		return e.Error()
 
 	}
-	return string(msg)
+	return string(datagram)
 
 }
 func Echo(ws *websocket.Conn) {
@@ -166,4 +195,33 @@ func Echo(ws *websocket.Conn) {
 			break
 		}
 	}
+}
+func NewDataGram(t int, msg *Message, data interface{}) *DataGram {
+	return &DataGram{
+		Type:    t,
+		Version: 0,
+
+		Data:    data,
+		Message: msg,
+	}
+
+}
+func NewMessage(senderid string, receiverid string, content string, timeStamp time.Time) *Message {
+
+	return &Message{
+		SenderID:   senderid,
+		ReceiverID: receiverid,
+		Content:    content,
+		TimeStamp:  timeStamp,
+		MsgVersion: 1,
+	}
+}
+func (m *Message) Copy() *Message {
+	return NewMessage(
+		m.SenderID,
+		m.ReceiverID,
+		m.Content,
+		m.TimeStamp,
+	)
+
 }
