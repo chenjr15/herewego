@@ -23,7 +23,7 @@ var (
 
 // main 接受请求 启动其他goroutine
 func main() {
-	host := "0.0.0.0:60067"
+	host := "0.0.0.0:60066"
 	listener, err := net.Listen("tcp", host)
 	if err != nil {
 		log.Fatalf("Fail to listen, %v", err)
