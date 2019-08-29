@@ -2,95 +2,86 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Ws </title>
+    <script src="./vue.js"></script>
+
+
 </head>
 
 <body>
 
-    <h1>WebSocket Echo Test</h1>
-    <form>
-        <p>
-            Message: <input id="message" type="text" value="">
-        </p>
-    </form>
-    <button onclick="send();">Send Message</button>
+    <div id="app">
+        <div class="box">
+            <div class="box">
+                <div class="columns is-mobile">
+                    <div class="control column">
+                        <input class="input" id="name" type="text" value="" placeholder="Your Name" v-model="myname">
+                    </div>
+                    <div class="column">
+                        <div class="button is-info" onclick="">Set Name</div>
+                    </div>
+
+
+                </div>
+                <div class="columns is-mobile">
+                    <div class="control column">
+                        <input class="input" id="wsuri" type="url" value="ws://localhost:60012" placeholder="Web socket url">
+                    </div>
+                    <div class="column control">
+                        <a class="button is-info" onclick="connectSocket()">Connect</a>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="control" style="margin-bottom: 10px;">
+                    <textarea class="textarea is-primary " id="message" type="text " placeholder="Message here " value=" "></textarea>
+                </div>
+                <div class="level">
+                    <div class=" control level-left has-icons-left">
+
+                        <div class="select level-item">
+                            <select>
+                                <option>*All</option>
+                                <option>*Yourself</option>
+                            </select>
+                            <div class="icon is-small is-left">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                        </div>
+
+                    </div>
+                    <br>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <a class="button is-primary " onclick="send(); ">Send Message</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <ul>
+
+            <li v-for="item in items ">
+                [{{item.message.sender_id}}]<i class="fa fa-angle-right " aria-hidden="true "></i>[{{item.message.receiver_id}}] : {{item.message.content}}
+            </li>
+        </ul>
+
+
+    </div>
 </body>
-<script type="text/javascript">
-    var sock = null;
-    var wsuri = "ws://localhost:60012";
-    var myid = null;
-    var lastmsg = null;
-    const TYPE_MSG = 0;
-    const TYPE_GETID = 1;
-    const TYPE_SETID = 2;
-    const TYPE_NEWUSER = 3;
-    const MSGTMPL = {
-        "type": 0,
-        "version": 0,
-        "data": {
-            "sender_id": "system",
-            "receiver_id": "222.76.251.164:54386",
-            "content": "Welcome",
-            "time_stamp": "2019-08-28T17:00:42.128094409+08:00",
-            "msg_version": 0
-        }
-    }
-    console.log("onload");
-
-    sock = new WebSocket(wsuri);
-
-    sock.onopen = function() {
-        console.log("connected to " + wsuri);
-    }
-
-    sock.onclose = function(e) {
-        console.log("connection closed (" + e.code + ")");
-    }
-
-    sock.onmessage = function(e) {
-
-        d = JSON.parse(e.data)
-        lastmsg = e.data
-            // console.log("message received: " + e.data);
-        switch (d.type) {
-            case TYPE_SETID:
-                myid = d.message.receiver_id
-                console.log("Set id " + myid);
-                break;
-
-            case TYPE_MSG:
-                console.log(`[${d.message.sender_id}]->[${d.message.receiver_id}] : ${d.message.content}`);
-            default:
-                break;
-        }
-
-    }
-
-    function NewMessage(content, to) {
-        var d = new Date();
-
-        var msg = {
-            "type": 0,
-            "version": 0,
-            "message": {
-                "sender_id": myid,
-                "receiver_id": to,
-                "content": content,
-                "time_stamp": d.toISOString(),
-                "msg_version": 0
-            }
-        }
-        msg.message.sender_id = myid;
-        msg.message.content = content
-        msg.message.receiver_id = to
-        return msg;
-    }
-
-    function send() {
-        var content = document.getElementById('message').value;
-        var msg = NewMessage(content, myid)
-        sock.send(JSON.stringify(msg));
-    };
+<script type="text/javascript " src="./names.js ">
 </script>
+<script type="text/javascript " src="./ws.js "></script>
+<link href="https://cdn.bootcss.com/font-awesome/5.10.2/css/all.css " rel="stylesheet ">
+<link href="https://cdn.bootcss.com/bulma/0.7.5/css/bulma.min.css " rel="stylesheet ">
 
 </html>
