@@ -32,8 +32,8 @@ func GetGeneralHandler(config *Config) func(http.ResponseWriter, *http.Request) 
 	}
 
 	generalHandler := func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Request from %s,UA:%s", r.RemoteAddr, r.UserAgent())
 		epath := "." + r.URL.EscapedPath()
+		log.Printf("Request from %s\nRequest %s \nUA:%s", r.RemoteAddr, epath, r.UserAgent())
 
 		w.Header().Set("Content-Type", "text/html")
 
