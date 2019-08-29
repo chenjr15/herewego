@@ -80,8 +80,13 @@ func dealWithNewDatagram(datagram *DataGram) {
 		return
 
 	case TYPE_MSG:
-		c := clients[datagram.Message.ReceiverID]
-		c.ch <- datagram
+		// 直接给全体
+		for _, c := range clients {
+			c.ch <- datagram
+		}
+
+		// c := clients[datagram.Message.ReceiverID]
+		// c.ch <- datagram
 
 	}
 }
