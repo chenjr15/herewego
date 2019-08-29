@@ -47,6 +47,7 @@ func main() {
 	clients = make(map[string]*Client)
 	go mux()
 	http.Handle("/", websocket.Handler(HandleMessage))
+	log.Print("Server string")
 
 	if err := http.ListenAndServe(":60012", nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
