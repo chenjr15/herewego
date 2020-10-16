@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/pelletier/go-toml"
@@ -202,10 +203,25 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 func ListDir(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// 获取ls参数, 即目标路径
-	lspath := r.URL.Query().Get("path")
+	lspath := path.Clean(r.URL.Query().Get("path"))
+	log.Println(lspath)
+	for strings.HasPrefix(lspath, "../") || strings.HasPrefix(lspath, "./") {
+		lspath = strings.ReplaceAll(lspath, "../", "")
+		lspath = strings.ReplaceAll(lspath, "./", "")
+	}
+	if lspath == ".." {
+		lspath = ""
+	}
+
+	// no /
+	lspath = url.PathEscape(lspath)
+	log.Println(lspath)
+
 	fi, err := os.Stat(lspath)
 	if err != nil {
+
 		w.Write([]byte(err.Error()))
+		return
 	}
 	var filelist []FileInfo
 	mode := fi.Mode()
@@ -226,6 +242,7 @@ func ListDir(w http.ResponseWriter, r *http.Request) {
 		files, err := dir.Readdirnames(100)
 		if err != nil {
 			log.Print(err)
+			return
 		}
 
 		filelist = make([]FileInfo, len(files)+1)
@@ -248,6 +265,7 @@ func ListDir(w http.ResponseWriter, r *http.Request) {
 	bytes, err := json.Marshal(filelist)
 	if err != nil {
 		w.Write([]byte(err.Error()))
+		return
 	}
 	w.Write(bytes)
 	return
