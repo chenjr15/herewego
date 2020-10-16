@@ -12,6 +12,7 @@ echo_buf_size = 8192
   # 默认的index文件， 如果访问的目录下有该文件， 则直接重定向至该文件
   index = "index.html"
   time = "/time"
+  listdir = "/listdir"
 
 [TemplateConfig]
   ListDirTemplate = """

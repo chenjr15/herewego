@@ -2,11 +2,13 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"time"
@@ -32,7 +34,9 @@ func GetGeneralHandler(config *Config) func(http.ResponseWriter, *http.Request) 
 	}
 
 	generalHandler := func(w http.ResponseWriter, r *http.Request) {
-		epath := "." + r.URL.EscapedPath()
+
+		epath, err := url.PathUnescape("." + r.URL.EscapedPath())
+
 		log.Printf("Request from %s\nRequest %s \nUA:%s", r.RemoteAddr, epath, r.UserAgent())
 
 		w.Header().Set("Content-Type", "text/html")
@@ -49,7 +53,7 @@ func GetGeneralHandler(config *Config) func(http.ResponseWriter, *http.Request) 
 		}()
 
 		// 尝试匹配index 文件
-		_, err := os.Stat(epath + config.RouteConfig.Index)
+		_, err = os.Stat(epath + config.RouteConfig.Index)
 		if os.IsNotExist(err) {
 			//Index 文件不存在的情况
 			// Just do noting
@@ -194,6 +198,61 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+// ListDir return json format ls result
+func ListDir(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	// 获取ls参数, 即目标路径
+	lspath := r.URL.Query().Get("path")
+	fi, err := os.Stat(lspath)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	}
+	var filelist []FileInfo
+	mode := fi.Mode()
+	switch {
+	case mode&os.ModeSymlink != 0:
+	case mode.IsRegular():
+		fileinfo := FileInfo{
+			fi.Name(),
+			0,
+			fi.Name(),
+		}
+
+		filelist = []FileInfo{fileinfo}
+
+	case mode.IsDir():
+		dir, err := os.Open(lspath)
+		// 尝试读取文件内容
+		files, err := dir.Readdirnames(100)
+		if err != nil {
+			log.Print(err)
+		}
+
+		filelist = make([]FileInfo, len(files)+1)
+		filelist[0] = FileInfo{
+			Name:     "../",
+			LinkName: "../",
+			Size:     0,
+		}
+
+		for i, filename := range files {
+			i++
+			filllFileInfo(path.Join(lspath, filename), &filelist[i])
+
+		}
+
+	default:
+		log.Printf("Not matched %s ,filemode: %d", lspath, fi.Mode())
+
+	}
+	bytes, err := json.Marshal(filelist)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	}
+	w.Write(bytes)
+	return
+}
+
 func filllFileInfo(filepath string, fileinfo *FileInfo) {
 	file, err := os.Stat(filepath)
 	if err != nil {
@@ -237,9 +296,10 @@ func GetDefaultConfig() (defaultConfig *Config) {
 		DefaultWelcomeMsg: "Simple Go server!",
 		EchoBufSize:       8 * 1024,
 		RouteConfig: RouteConfig{
-			Index: "index.html",
-			Echo:  "/echo",
-			Time:  "/time",
+			Index:   "index.html",
+			Echo:    "/echo",
+			Time:    "/time",
+			ListDir: "/listdir",
 		},
 		TemplateConfig: TemplateConfig{
 			ListDirTemplate: `<html>

@@ -19,6 +19,7 @@ func main() {
 	http.HandleFunc("/", GetGeneralHandler(config))
 	http.HandleFunc(config.RouteConfig.Echo, Echo)
 	http.HandleFunc(config.RouteConfig.Time, ShowTime)
+	http.HandleFunc(config.RouteConfig.ListDir, ListDir)
 
 	log.Fatal(http.ListenAndServe(config.HTTPConfig.Host, nil))
 }
