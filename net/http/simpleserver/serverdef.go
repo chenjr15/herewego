@@ -10,7 +10,7 @@ type RouteConfig struct {
 	Index   string `toml:"index" comment:"默认的index文件， 如果访问的目录下有该文件， 则直接重定向至该文件"`
 	Echo    string `toml:"echo"`
 	Time    string `toml:"time"`
-	ListDir string `toml:"listdir`
+	ListDir string `toml:"listdir"`
 }
 
 // TemplateConfig if ListDirTemplateFile was set , ListDirTemplate will be ignore
