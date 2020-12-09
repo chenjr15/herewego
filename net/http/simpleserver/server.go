@@ -204,6 +204,7 @@ func ListDir(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// 获取ls参数, 即目标路径
 	lspath := path.Clean(r.URL.Query().Get("path"))
+	lspath = path.Base(lspath)
 	log.Println(lspath)
 	for strings.HasPrefix(lspath, "../") || strings.HasPrefix(lspath, "./") {
 		lspath = strings.ReplaceAll(lspath, "../", "")
@@ -212,9 +213,15 @@ func ListDir(w http.ResponseWriter, r *http.Request) {
 	if lspath == ".." {
 		lspath = ""
 	}
+	if lspath == "." {
+		lspath = ""
+	}
+	if lspath == "" {
+		lspath = "/404"
+	}
 
 	// no /
-	lspath = url.PathEscape(lspath)
+	// lspath = url.PathEscape(lspath)
 	log.Println(lspath)
 
 	fi, err := os.Stat(lspath)
