@@ -37,8 +37,12 @@ func GetGeneralHandler(config *Config) func(http.ResponseWriter, *http.Request) 
 	generalHandler := func(w http.ResponseWriter, r *http.Request) {
 
 		epath, err := url.PathUnescape("." + r.URL.EscapedPath())
+		raddr := r.RemoteAddr
 
-		log.Printf("Request from %s\nRequest %s \nUA:%s", r.RemoteAddr, epath, r.UserAgent())
+		if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+			raddr = fmt.Sprintf("XFF|%s", xff)
+		}
+		log.Printf("From: %s\tRequest: %s\nUA:%s", raddr, epath, r.UserAgent())
 
 		w.Header().Set("Content-Type", "text/html")
 
@@ -222,7 +226,7 @@ func ListDir(w http.ResponseWriter, r *http.Request) {
 
 	// no /
 	// lspath = url.PathEscape(lspath)
-	log.Println(lspath)
+	log.Println("listing:", lspath)
 
 	fi, err := os.Stat(lspath)
 	if err != nil {
