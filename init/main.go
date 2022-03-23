@@ -1,8 +1,19 @@
 package main
 
-import "fmt"
-import _ "./pkg"
+import (
+	"fmt"
+	"init/pkg"
+)
+import _ "init/pkg"
 
 func main() {
-	fmt.Println("vim-go")
+
+	pkg.Hello("Hello!")
+}
+func init() {
+	fmt.Println("init1 in main ")
+}
+
+func init() {
+	fmt.Println("init2 in main ")
 }
