@@ -15,9 +15,9 @@ Go语言学习笔记
  - [config_file_read](config_file_read) 读取配置文件的代码
  - [database](database) SQL的示例
  - [data_structure](data_structure) 一些常见数据结构(链表/树)
- - [design_pattern](design_pattern) 设计模式
+ - [design_pattern](design_pattern) 设计模式, 单例、工厂、策略
  - [init](init) 探究go中init函数的执行顺序
- - [lintcode](lintcode) Lintcode 刷题记录,目前只有一题
+ - [lintcode](lintcode) Lintcode 刷题记录,目前只有一题, leetcode的记录在这里：[leetcode](https://github.com/chenjr15/leetcode)
  - [multi_table](multi_table) 一个打印乘法表的例子
  - [net](net) 网络编程相关 http/socket/websocket
  - [the_way_to_go](the_way_to_go) [The Way To Go](https://github.com/unknwon/the-way-to-go_ZH_CN) 的习题代码
