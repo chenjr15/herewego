@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"mime"
 	"net/http"
 	"net/url"
 	"os"
@@ -64,6 +65,7 @@ func GetGeneralHandler(config *Config) func(http.ResponseWriter, *http.Request) 
 			// Just do noting
 		} else if err == nil {
 			log.Printf("Redirecting ")
+			// 这里如果是子目录的话要加上子目录的路径,否则永远都会跳到首页
 			http.Redirect(w, r, config.RouteConfig.Index, http.StatusSeeOther)
 			return
 
@@ -88,7 +90,10 @@ func GetGeneralHandler(config *Config) func(http.ResponseWriter, *http.Request) 
 		handleRegularFile := func() {
 
 			// 返回文件内容
-			w.Header().Set("Content-Type", "raw")
+			//w.Header().Set("Content-Type", "raw")
+			// + 应该返回特定的文件内容
+			mimetype := mime.TypeByExtension(path.Ext(epath))
+			w.Header().Set("Content-Type", mimetype)
 			// w.Header().Set("Content-Type", "application/octet-stream")
 			// w.Header().Set("Content-Disposition", "attachment; filename="+fi.Name())
 			f, err := os.OpenFile(path.Join(path.Dir(epath), fi.Name()), os.O_RDONLY, 0644)
@@ -208,7 +213,7 @@ func ListDir(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// 获取ls参数, 即目标路径
 	lspath := path.Clean(r.URL.Query().Get("path"))
-	lspath = path.Base(lspath)
+	lspath = path.Clean(lspath)
 	log.Println(lspath)
 	for strings.HasPrefix(lspath, "../") || strings.HasPrefix(lspath, "./") {
 		lspath = strings.ReplaceAll(lspath, "../", "")
