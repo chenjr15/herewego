@@ -18,8 +18,8 @@ func main() {
 	<-nilchan
 }
 
-// BatchReadChannel 批量读取channel结果，每次最多读取n个，至少等待atLeastWait时间
-// ok 表示是否成功读取到至少一个结果（即使后续channel关闭）
+// BatchReadChannel 批量读取channel结果，函数第一个结果不受超时时间控制，剩下n-1个结果受超时时间控制。
+// ok 为true表示是否成功读取到至少一个结果（即使后续channel关闭），ok 为false 则表示channel已关闭，且结果为空。
 func BatchReadChannel[T any](channel <-chan T, n int, atLeastWait time.Duration) (results []T, ok bool) {
 	if channel == nil {
 		return nil, false
@@ -31,7 +31,7 @@ func BatchReadChannel[T any](channel <-chan T, n int, atLeastWait time.Duration)
 		return nil, false
 	}
 	results = append(results, result)
-	// step 2. 判断是否需要继续读取
+	// step 2.1 判断是否需要继续读取
 	remainingTime := atLeastWait - time.Since(start)
 	if n < 2 && remainingTime <= time.Millisecond {
 		// 时间已过，直接返回
@@ -39,7 +39,7 @@ func BatchReadChannel[T any](channel <-chan T, n int, atLeastWait time.Duration)
 	}
 	ddlTimer := time.NewTimer(remainingTime)
 	defer ddlTimer.Stop()
-	// step 2. 批量读取结果 最多n-1个，超时后退出
+	// step 2.2 批量读取结果 最多n-1个，超时后退出
 	for i := 1; i < n; i++ {
 		select {
 		case result, ok = <-channel:
