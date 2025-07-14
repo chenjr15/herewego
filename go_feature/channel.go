@@ -33,8 +33,8 @@ func BatchReadChannel[T any](channel <-chan T, n int, atLeastWait time.Duration)
 	results = append(results, result)
 	// step 2.1 判断是否需要继续读取
 	remainingTime := atLeastWait - time.Since(start)
-	if n < 2 && remainingTime <= time.Millisecond {
-		// 时间已过，直接返回
+	if n < 2 || remainingTime <= time.Millisecond {
+		// 数量满足，或者时间已过，直接返回
 		return results, true
 	}
 	ddlTimer := time.NewTimer(remainingTime)
